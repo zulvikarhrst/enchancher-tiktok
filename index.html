@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clean Uploader</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+
+        /* Container utama */
+        .container {
+            max-width: 520px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Card utama */
+        .card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 40px 32px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+            border: 1px solid #eaeaea;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .header .badge {
+            font-size: 12px;
+            color: #86868b;
+            font-weight: 400;
+        }
+
+        .header .divider {
+            width: 32px;
+            height: 2px;
+            background: #d4d4d4;
+            margin: 16px auto 0;
+        }
+
+        /* Dropzone */
+        .dropzone {
+            border: 1.5px dashed #c6c6c8;
+            border-radius: 20px;
+            padding: 48px 24px;
+            text-align: center;
+            background: #fbfbfd;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dropzone:hover {
+            border-color: #1a1a1a;
+            background: #f5f5f7;
+        }
+
+        .dropzone.drag-over {
+            border-color: #1a1a1a;
+            background: #f5f5f7;
+        }
+
+        .dropzone-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+            opacity: 0.7;
+        }
+
+        .dropzone-text {
+            font-size: 16px;
+            font-weight: 450;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+
+        .dropzone-hint {
+            font-size: 13px;
+            color: #86868b;
+        }
+
+        /* File info */
+        .file-info {
+            margin-top: 20px;
+            padding: 14px 18px;
+            background: #f5f5f7;
+            border-radius: 14px;
+            font-size: 14px;
+            color: #1a1a1a;
+            word-break: break-word;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-info-icon {
+            font-size: 20px;
+        }
+
+        .file-info-details {
+            flex: 1;
+        }
+
+        .file-info-name {
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .file-info-size {
+            font-size: 12px;
+            color: #86868b;
+        }
+
+        /* Button */
+        .patch-btn {
+            width: 100%;
+            padding: 14px 20px;
+            margin-top: 24px;
+            background: #1a1a1a;
+            color: #ffffff;
+            border: none;
+            border-radius: 40px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .patch-btn:hover:not(:disabled) {
+            background: #333333;
+            transform: scale(0.98);
+        }
+
+        .patch-btn:disabled {
+            background: #e5e5ea;
+            color: #8e8e93;
+            cursor: not-allowed;
+        }
+
+        /* Status */
+        .status {
+            margin-top: 20px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 13px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .status-info {
+            background: #f5f5f7;
+            color: #1a1a1a;
+        }
+
+        .status-success {
+            background: #f0fdf4;
+            color: #166534;
+        }
+
+        .status-error {
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        /* Footer links - text only, minimal */
+        .footer-links {
+            margin-top: 32px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .footer-links a {
+            color: #8e8e93;
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.2s ease;
+            letter-spacing: 0.2px;
+        }
+
+        .footer-links a:hover {
+            color: #1a1a1a;
+        }
+
+        .footer-links .separator {
+            color: #d4d4d4;
+            font-size: 11px;
+        }
+
+        /* Credit line */
+        .credit {
+            margin-top: 28px;
+            text-align: center;
+            font-size: 11px;
+            color: #b0b0b5;
+        }
+
+        /* Hidden input */
+        #fileInput {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1>Clean Uploader</h1>
+                <div class="badge">by <a href="https://www.tiktok.com/@0x0g0ds" target="_blank" rel="noopener noreferrer">potaldogg</a></div>
+                <div class="divider"></div>
+            </div>
+
+            <!-- Dropzone -->
+            <div class="dropzone" id="dropzone">
+                <div class="dropzone-icon">⌘</div>
+                <div class="dropzone-text">drop video here</div>
+                <div class="dropzone-hint">MP4 or MOV · click to browse</div>
+            </div>
+            <input type="file" id="fileInput" accept=".mp4,.mov">
+
+            <!-- File info (hidden initially) -->
+            <div id="fileInfo" style="display: none;" class="file-info">
+                <div class="file-info-icon">📹</div>
+                <div class="file-info-details">
+                    <div class="file-info-name" id="fileName"></div>
+                    <div class="file-info-size" id="fileSize"></div>
+                </div>
+            </div>
+
+            <!-- Patch button -->
+            <button class="patch-btn" id="patchBtn" disabled>patch video</button>
+
+            <!-- Status message -->
+            <div id="status" class="status status-info" style="display: none;"></div>
+        </div>
+
+        <!-- Social links - text only, minimal -->
+        <div class="footer-links">
+            <a href="https://www.tiktok.com/@zvverse" target="_blank" rel="noopener noreferrer">tiktok</a>
+            <span class="separator">/</span>
+            <a href="https://www.instagram.com/zulharist" target="_blank" rel="noopener noreferrer">instagram</a>
+            <span class="separator">/</span>
+            <a href="https://github.com/zulvikarhrst" target="_blank" rel="noopener noreferrer">github</a>
+        </div>
+        <div class="credit">
+            patch payload 0x10000001 · tiktok studio ready
+        </div>
+        <div style="margin-top:12px; text-align:center; font-size:12px; color:#6b6b70;">
+            <button id="downloadRemuxBtn" style="background:#fff;border:1px solid #e1e1e6;border-radius:10px;padding:8px 12px;cursor:pointer">Unduh helper remux (Windows)</button>
+            <div style="margin-top:8px;color:#9b9b9f;">Gunakan helper ini dengan ffmpeg untuk meminimalkan kemungkinan re-encoding saat upload.</div>
+        </div>
+    </div>
+
+    <script>
+        const PAYLOAD = 0x10000001; // 268435457
+        const CHUNK_SIZE = 4 * 1024 * 1024; // 4MB chunks to avoid loading entire file
+        let selectedFile = null;
+
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const patchBtn = document.getElementById('patchBtn');
+        const statusEl = document.getElementById('status');
+        const fileInfoDiv = document.getElementById('fileInfo');
+        const fileNameSpan = document.getElementById('fileName');
+        const fileSizeSpan = document.getElementById('fileSize');
+
+        function showStatus(message, type = 'info') {
+            statusEl.textContent = message;
+            statusEl.className = `status status-${type}`;
+            statusEl.style.display = 'block';
+        }
+
+        function hideStatus() {
+            statusEl.style.display = 'none';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+            return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+        }
+
+        function handleFile(file) {
+            if (!file) return;
+
+            const name = file.name.toLowerCase();
+            if (!name.endsWith('.mp4') && !name.endsWith('.mov')) {
+                showStatus('❌ format tidak didukung · gunakan .mp4 atau .mov', 'error');
+                selectedFile = null;
+                fileInfoDiv.style.display = 'none';
+                patchBtn.disabled = true;
+                return;
+            }
+
+            selectedFile = file;
+            fileNameSpan.textContent = file.name;
+            fileSizeSpan.textContent = formatFileSize(file.size);
+            fileInfoDiv.style.display = 'flex';
+
+            showStatus(`✓ file siap dipatch · ${formatFileSize(file.size)}`, 'success');
+            patchBtn.disabled = false;
+        }
+
+        dropzone.addEventListener('click', () => fileInput.click());
+
+        // Prevent browser from opening files when dropped outside
+        window.addEventListener('dragover', (e) => e.preventDefault());
+        window.addEventListener('drop', (e) => e.preventDefault());
+
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('drag-over');
+        });
+
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('drag-over');
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file) handleFile(file);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) handleFile(e.target.files[0]);
+        });
+
+        // Chunked search for 'elst' atom to avoid loading whole file
+        async function findElstIndex(file, onProgress) {
+            const magic = [0x65, 0x6C, 0x73, 0x74]; // 'elst'
+            const size = file.size;
+            let pos = 0;
+            let prevTail = new Uint8Array(0);
+
+            while (pos < size) {
+                const end = Math.min(pos + CHUNK_SIZE, size);
+                const slice = file.slice(pos, end);
+                const buffer = await slice.arrayBuffer();
+                const chunk = new Uint8Array(buffer);
+
+                // Combine tail (up to 3 bytes) with current chunk to catch boundary matches
+                const combined = new Uint8Array(prevTail.length + chunk.length);
+                combined.set(prevTail, 0);
+                combined.set(chunk, prevTail.length);
+
+                for (let i = 0; i <= combined.length - 4; i++) {
+                    if (combined[i] === magic[0] && combined[i+1] === magic[1] && combined[i+2] === magic[2] && combined[i+3] === magic[3]) {
+                        return pos - prevTail.length + i;
+                    }
+                }
+
+                // keep last 3 bytes for overlap
+                prevTail = combined.slice(Math.max(0, combined.length - 3));
+                pos = end;
+                if (onProgress) onProgress(Math.min(99, Math.floor((pos / size) * 100)));
+                await new Promise(r => setTimeout(r, 0)); // yield to UI
+            }
+
+            return -1;
+        }
+
+        async function patchVideo(file) {
+            showStatus('🔍 mencari atom elst...', 'info');
+            const elstIndex = await findElstIndex(file, (p) => showStatus(`🔍 mencari atom elst... ${p}%`, 'info'));
+            if (elstIndex === -1) throw new Error('atom \"elst\" tidak ditemukan · pastikan file MP4/MOV valid');
+
+            const offset = elstIndex + 8;
+            if (offset + 4 > file.size) throw new Error('file terlalu kecil untuk menyisipkan payload');
+
+            const payloadBytes = new Uint8Array([
+                (PAYLOAD >> 24) & 0xFF,
+                (PAYLOAD >> 16) & 0xFF,
+                (PAYLOAD >> 8) & 0xFF,
+                PAYLOAD & 0xFF
+            ]);
+
+            // Create new Blob by concatenating three parts: before, payload, after
+            const before = file.slice(0, offset);
+            const after = file.slice(offset + 4);
+            const outBlob = new Blob([before, payloadBytes, after], { type: file.type || 'video/mp4' });
+            return outBlob;
+        }
+
+        patchBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            patchBtn.disabled = true;
+            patchBtn.textContent = 'memproses...';
+            dropzone.style.pointerEvents = 'none';
+
+            try {
+                const patchedBlob = await patchVideo(selectedFile);
+
+                const url = URL.createObjectURL(patchedBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                const originalName = selectedFile.name.replace(/\.[^/.]+$/, '');
+                const ext = selectedFile.name.split('.').pop();
+                a.download = `${originalName}_clean.${ext}`;
+
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                showStatus('✓ selesai · video sudah di-patch dan di-download · upload ke tiktok studio', 'success');
+            } catch (err) {
+                showStatus('✗ ' + (err && err.message ? err.message : err), 'error');
+            } finally {
+                patchBtn.disabled = false;
+                patchBtn.textContent = 'patch video';
+                dropzone.style.pointerEvents = '';
+            }
+        });
+
+        // Download remux helper script
+        const downloadRemuxBtn = document.getElementById('downloadRemuxBtn');
+        if (downloadRemuxBtn) {
+            downloadRemuxBtn.addEventListener('click', () => {
+                const content = `Param(\n    [Parameter(Mandatory=$true)][string]$input\n)\n\n$ffmpeg = \"ffmpeg\"\n\n# Check if ffmpeg is available\ntry {\n    & $ffmpeg -version > $null 2>&1\n} catch {\n    Write-Error \"ffmpeg tidak ditemukan. Install ffmpeg dan pastikan ada di PATH.\"\n    exit 1\n}\n\nif (-not (Test-Path $input)) {\n    Write-Error \"File input tidak ditemukan: $input\"\n    exit 1\n}\n\n$dir = Split-Path -Parent $input\n$base = [System.IO.Path]::GetFileNameWithoutExtension($input)\n$ext = [System.IO.Path]::GetExtension($input)\n$output = Join-Path $dir (\"${base}_faststart${ext}\")\n\nWrite-Output \"Menjalankan: ffmpeg -i \\\"$input\\\" -c copy -movflags +faststart \\\"$output\\\"\"\n& $ffmpeg -y -i $input -c copy -movflags +faststart $output\n\nif ($LASTEXITCODE -eq 0) {\n    Write-Output \"Selesai. Output: $output\"\n} else {\n    Write-Error \"ffmpeg gagal (exit code $LASTEXITCODE)\"\n}\n`;
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'remux-faststart.ps1';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+        }
+    </script>
+</body>
+</html>
