@@ -102,12 +102,8 @@
                 <div id="fileSize" style="color:#9be7c4;font-size:0.95rem"></div>
             </div>
 
-            <div style="display:flex;flex-direction:column;gap:12px;align-items:center;">
-                <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
-                    <button id="patchBtn" class="btn-primary" disabled style="min-width:160px;">PATCH</button>
-                    <button id="downloadRemuxBtn" class="btn-muted" style="min-width:160px;">Remux helper</button>
-                </div>
-                <div style="color:#9fbfdf;font-size:0.9rem;text-align:center;max-width:30rem;">Di HP cukup pilih &amp; patch lalu upload; remux helper untuk desktop/PC bila diperlukan.</div>
+            <div style="display:flex;gap:12px;justify-content:center;">
+                <button id="patchBtn" class="btn-primary" disabled style="min-width:160px;">PATCH</button>
             </div>
 
             <div id="status" class="status" style="display:none"></div>
@@ -289,26 +285,7 @@
             }
         });
 
-        // Download remux helper script
-        const downloadRemuxBtn = document.getElementById('downloadRemuxBtn');
-        if (isMobile && downloadRemuxBtn) {
-            downloadRemuxBtn.textContent = 'Remux helper (desktop)';
-            downloadRemuxBtn.title = 'Remux helper hanya untuk desktop/PC';
-        }
 
-        function offerRemuxDownload() {
-            const content = `Param(\n    [Parameter(Mandatory=$true)][string]$input\n)\n\n$ffmpeg = \"ffmpeg\"\n\n# Check if ffmpeg is available\ntry {\n    & $ffmpeg -version > $null 2>&1\n} catch {\n    Write-Error \"ffmpeg tidak ditemukan. Install ffmpeg dan pastikan ada di PATH.\"\n    exit 1\n}\n\nif (-not (Test-Path $input)) {\n    Write-Error \"File input tidak ditemukan: $input\"\n    exit 1\n}\n\n$dir = Split-Path -Parent $input\n$base = [System.IO.Path]::GetFileNameWithoutExtension($input)\n$ext = [System.IO.Path]::GetExtension($input)\n$output = Join-Path $dir (\"${base}_faststart${ext}\")\n\nWrite-Output \"Menjalankan: ffmpeg -i \\\"$input\\\" -c copy -movflags +faststart \\\"$output\\\"\"\n& $ffmpeg -y -i $input -c copy -movflags +faststart $output\n\nif ($LASTEXITCODE -eq 0) {\n    Write-Output \"Selesai. Output: $output\"\n} else {\n    Write-Error \"ffmpeg gagal (exit code $LASTEXITCODE)\"\n}\n`;
-            const blob = new Blob([content], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'remux-faststart.ps1';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-        if (downloadRemuxBtn) downloadRemuxBtn.addEventListener('click', offerRemuxDownload);
     </script>
 </body>
 </html>
