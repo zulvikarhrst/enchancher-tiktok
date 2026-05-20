@@ -3,306 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clean Uploader</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* Radical redesign: split layout, neon accents */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html,body { height: 100%; }
         body {
-            font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: radial-gradient(circle at top left, rgba(14, 165, 233, 0.16), transparent 22%),
-                        radial-gradient(circle at bottom right, rgba(168, 85, 247, 0.14), transparent 18%),
-                        #020617;
-            min-height: 100vh;
+            font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+            background: linear-gradient(180deg, #06070a 0%, #0b1220 50%, #07102a 100%);
+            color: #e6eef8;
             display: flex;
-            justify-content: center;
             align-items: center;
-            padding: 24px;
-            color: #e2e8f0;
+            justify-content: center;
+            padding: 28px;
         }
 
-        .container {
-            width: min(100%, 640px);
-            margin: 0 auto;
-        }
-
-        .card {
-            background: rgba(10, 16, 32, 0.92);
-            border: 1px solid rgba(148, 163, 184, 0.12);
-            border-radius: 36px;
-            padding: 36px;
-            box-shadow: 0 28px 80px rgba(15, 23, 42, 0.45);
-            backdrop-filter: blur(18px);
-        }
-
-        .header {
+        .split {
+            width: min(100%, 1100px);
+            height: min(90vh, 760px);
             display: grid;
-            gap: 18px;
-            text-align: center;
-            margin-bottom: 34px;
+            grid-template-columns: 1fr 480px;
+            gap: 28px;
+            align-items: stretch;
         }
 
-        .header h1 {
-            font-size: clamp(2rem, 3vw, 3rem);
-            font-weight: 800;
-            letter-spacing: -0.05em;
-            color: #f8fafc;
-            margin-bottom: 0;
-        }
-
-        .header p {
-            font-size: 1rem;
-            line-height: 1.8;
-            color: #e2e8f0;
-            max-width: 520px;
-            margin: 0 auto;
-        }
-
-        .header .badge {
-            justify-self: center;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
-            color: #f8fafc;
-            background: rgba(59, 130, 246, 0.12);
-            padding: 10px 16px;
-            border-radius: 999px;
-            border: 1px solid rgba(59, 130, 246, 0.18);
-        }
-
-        .header .divider {
-            width: 48px;
-            height: 3px;
-            background: linear-gradient(90deg, #38bdf8, #8b5cf6);
-            margin: 0 auto;
-            border-radius: 999px;
-        }
-
-        .dropzone {
-            border: 1px dashed rgba(148, 163, 184, 0.4);
-            border-radius: 28px;
-            padding: 44px 28px;
-            text-align: center;
-            background: rgba(15, 23, 42, 0.82);
-            cursor: pointer;
-            transition: transform 0.24s ease, border-color 0.24s ease, background 0.24s ease, box-shadow 0.24s ease;
-        }
-
-        .dropzone:hover,
-        .dropzone.drag-over {
-            transform: translateY(-2px);
-            border-color: rgba(56, 189, 248, 0.85);
-            background: rgba(15, 23, 42, 0.98);
-            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.45);
-        }
-
-        .dropzone-icon {
-            font-size: 48px;
-            margin-bottom: 14px;
-            opacity: 0.95;
-        }
-
-        .dropzone-text {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 10px;
-        }
-
-        .dropzone-hint {
-            font-size: 0.95rem;
-            color: #dbeafe;
-        }
-
-        .file-info {
-            margin-top: 24px;
-            padding: 20px 22px;
-            background: rgba(15, 23, 42, 0.82);
-            border: 1px solid rgba(148, 163, 184, 0.16);
-            border-radius: 22px;
-            font-size: 0.95rem;
-            color: #e2e8f0;
-            word-break: break-word;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .file-info-icon {
-            font-size: 26px;
-        }
-
-        .file-info-name {
-            font-weight: 700;
-            margin-bottom: 4px;
-            color: #f8fafc;
-        }
-
-        .file-info-size {
-            font-size: 0.88rem;
-            color: #94a3b8;
-        }
-
-        .patch-btn {
-            width: 100%;
-            padding: 18px 24px;
-            margin-top: 28px;
-            background: linear-gradient(135deg, #38bdf8, #8b5cf6);
-            color: #020617;
-            border: none;
-            border-radius: 999px;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
-            box-shadow: 0 18px 46px rgba(56, 189, 248, 0.24);
-        }
-
-        .patch-btn:hover:not(:disabled) {
-            transform: translateY(-1px);
-            box-shadow: 0 22px 54px rgba(56, 189, 248, 0.28);
-        }
-
-        .patch-btn:disabled {
-            background: rgba(148, 163, 184, 0.22);
-            color: #64748b;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        .helper-btn {
-            width: auto;
-            padding: 11px 18px;
-            margin-top: 0;
-            background: rgba(56, 189, 248, 0.14);
-            color: #ffffff;
-            border: 1px solid rgba(56, 189, 248, 0.45);
-            border-radius: 999px;
-            font-size: 0.95rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-        }
-
-        .helper-btn:hover {
-            transform: translateY(-1px);
-            background: rgba(56, 189, 248, 0.25);
-            border-color: rgba(56, 189, 248, 0.7);
-        }
-
-        .status {
-            margin-top: 22px;
-            padding: 16px 20px;
+        .panel {
+            background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+            border: 1px solid rgba(255,255,255,0.03);
             border-radius: 20px;
-            font-size: 0.97rem;
-            text-align: center;
-            transition: opacity 0.2s ease, transform 0.2s ease;
+            padding: 40px 40px;
+            display:flex;
+            flex-direction:column;
+            gap:18px;
+            box-shadow: 0 10px 40px rgba(3,7,18,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
         }
 
-        .status-info {
-            background: rgba(100, 116, 139, 0.16);
-            color: #e2e8f0;
+        .panel h2 { font-size: 2.2rem; letter-spacing: -0.02em; color:#f8fafc; }
+        .panel p.lead { color: #bfdbfe; max-width: 42ch; line-height:1.6; }
+
+        .features { margin-top:12px; display:grid; gap:10px; }
+        .feat { display:flex; gap:12px; align-items:flex-start; }
+        .tag { width:44px; height:44px; border-radius:10px; background:linear-gradient(135deg,#06b6d4,#7c3aed); display:flex; align-items:center; justify-content:center; color:#020617; font-weight:700; }
+        .feat .t { color:#c7d2fe; font-weight:700; }
+        .feat .d { color:#93c5fd; font-size:0.95rem; }
+
+        .right {
+            display:flex; flex-direction:column; gap:18px; justify-content:center; align-items:center;
         }
 
-        .status-success {
-            background: rgba(16, 185, 129, 0.16);
-            color: #a7f3d0;
+        .uploader {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient( circle at 30% 20%, rgba(124,58,237,0.08), transparent 15% ), rgba(2,6,23,0.6);
+            border-radius: 20px;
+            padding: 34px 28px;
+            display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px;
+            border: 1px solid rgba(124,58,237,0.12);
         }
 
-        .status-error {
-            background: rgba(248, 113, 113, 0.16);
-            color: #fecaca;
+        .drop-circle {
+            width: 320px; height: 320px; border-radius: 50%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+            background: radial-gradient(circle at 40% 35%, rgba(34,197,94,0.06), transparent 30%), linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+            border: 2px dashed rgba(124,58,237,0.22);
+            transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+            box-shadow: 0 18px 50px rgba(7,10,20,0.6);
         }
+        .drop-circle.drag-over { transform: scale(1.03); border-color: rgba(34,197,94,0.9); box-shadow: 0 30px 80px rgba(34,197,94,0.06); }
+        .drop-circle .icon { font-size: 68px; color: #c7f9e3; }
+        .drop-circle .title { font-weight:800; font-size:1.15rem; color:#e6fdf2; }
+        .drop-circle .sub { color:#bde8cc; font-size:0.95rem; }
 
-        .footer-links {
-            margin-top: 34px;
-            display: flex;
-            justify-content: center;
-            gap: 14px;
-            flex-wrap: wrap;
-            font-size: 0.9rem;
-            color: #cbd5e1;
-        }
+        .file-info { margin-top: 12px; text-align:center; color:#d1fae5; }
 
-        .footer-links a {
-            color: #94a3b8;
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
+        .action-row { width:100%; display:flex; gap:12px; justify-content:center; align-items:center; margin-top:8px; }
+        .btn-primary { background: linear-gradient(90deg,#06b6d4,#7c3aed); color:#021024; padding:14px 22px; border-radius:12px; font-weight:800; border:none; cursor:pointer; box-shadow: 0 12px 30px rgba(124,58,237,0.18); }
+        .btn-muted { background: transparent; color:#9fbfdf; border:1px solid rgba(255,255,255,0.05); padding:10px 14px; border-radius:10px; cursor:pointer; }
 
-        .footer-links a:hover {
-            color: #f8fafc;
-        }
+        .status { margin-top:12px; color:#a7f3d0; }
 
-        .footer-links .separator {
-            display: inline-block;
-            color: rgba(148, 163, 184, 0.7);
-        }
-
-        .credit {
-            margin-top: 24px;
-            text-align: center;
-            font-size: 0.85rem;
-            color: #cbd5e1;
-        }
-
-        #fileInput {
-            display: none;
-        }
+        /* responsive */
+        @media (max-width:1000px){ .split{ grid-template-columns: 1fr; height:auto; } .right{ order:-1 } .drop-circle{ width:260px; height:260px } }
+    </style>
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="card">
-            <div class="header">
-                <h1>Clean Uploader</h1>
-                <p style="margin-top:12px; font-size:0.98rem; color:#cbd5e1; line-height:1.7; max-width:420px; margin-left:auto; margin-right:auto;">Patch file video dengan aman dan unduh siap upload ke TikTok Studio tanpa re-encoding tambahan.</p>
-                <div class="badge">by <a href="https://www.tiktok.com/@zvversee" target="_blank" rel="noopener noreferrer">zvversee</a></div>
-                <div class="divider"></div>
+    <body>
+    <div class="split">
+        <div class="panel">
+            <h2>Clean Uploader — Zero‑touch patch</h2>
+            <p class="lead">Patch satu titik di file video untuk membuatnya siap upload tanpa re-encoding lokal. Desain fokus pada keamanan file dan kemudahan pemakaian.</p>
+
+            <div class="features">
+                <div class="feat"><div class="tag">01</div><div><div class="t">No re-encode</div><div class="d">Kami hanya menyisipkan 4 byte, tidak mem-decode ulang video.</div></div></div>
+                <div class="feat"><div class="tag">02</div><div><div class="t">Safe stream</div><div class="d">Gunakan remux helper untuk memastikan atom `moov` di depan (faststart).</div></div></div>
+                <div class="feat"><div class="tag">03</div><div><div class="t">Light & fast</div><div class="d">Processing tanpa menghabiskan memori besar berkat chunked reader.</div></div></div>
             </div>
 
-            <!-- Dropzone -->
-            <div class="dropzone" id="dropzone">
-                <div class="dropzone-icon">⌘</div>
-                <div class="dropzone-text">drop video here</div>
-                <div class="dropzone-hint">MP4 or MOV · click to browse</div>
+            <div style="margin-top:auto; display:flex; gap:12px; align-items:center;">
+                <button id="downloadRemuxBtn" class="btn-muted">Download remux helper</button>
+                <a href="README-REMUX.md" class="btn-muted" style="text-decoration:none;">How-to</a>
             </div>
-            <input type="file" id="fileInput" accept=".mp4,.mov">
+        </div>
 
-            <!-- File info (hidden initially) -->
-            <div id="fileInfo" style="display: none;" class="file-info">
-                <div class="file-info-icon">📹</div>
-                <div class="file-info-details">
-                    <div class="file-info-name" id="fileName"></div>
-                    <div class="file-info-size" id="fileSize"></div>
+        <div class="right">
+            <div class="uploader">
+                <div id="dropzone" class="drop-circle">
+                    <div class="icon">⌘</div>
+                    <div class="title">Drop video</div>
+                    <div class="sub">MP4 or MOV · click to browse</div>
                 </div>
+                <input type="file" id="fileInput" accept=".mp4,.mov" style="display:none" />
+
+                <div id="fileInfo" class="file-info" style="display:none">
+                    <div id="fileName" style="font-weight:800;color:#e6fff3"></div>
+                    <div id="fileSize" style="color:#9be7c4;font-size:0.95rem"></div>
+                </div>
+
+                <div class="action-row">
+                    <button id="patchBtn" class="btn-primary" disabled>PATCH VIDEO</button>
+                    <button id="downloadRemuxBtn2" class="btn-muted">Remux (download)</button>
+                </div>
+
+                <div id="status" class="status" style="display:none"></div>
             </div>
-
-            <!-- Patch button -->
-            <button class="patch-btn" id="patchBtn" disabled>patch video</button>
-
-            <!-- Status message -->
-            <div id="status" class="status status-info" style="display: none;"></div>
-        </div>
-
-        <!-- Social links - text only, minimal -->
-        <div class="footer-links">
-            <a href="https://www.tiktok.com/@zvversee" target="_blank" rel="noopener noreferrer">tiktok</a>
-            <span class="separator">/</span>
-            <a href="https://www.instagram.com/zulharist" target="_blank" rel="noopener noreferrer">instagram</a>
-            <span class="separator">/</span>
-            <a href="https://github.com/zulvikarhrst" target="_blank" rel="noopener noreferrer">github</a>
-        </div>
-        <div class="credit">
-            patch payload 0x10000001 · tiktok studio ready
-        </div>
-        <div style="margin-top:14px; text-align:center; font-size:0.92rem; color:#94a3b8; display:grid; gap:10px;">
-            <button id="downloadRemuxBtn" class="helper-btn">Unduh helper remux (Windows)</button>
-            <div style="line-height:1.6;">Gunakan helper ini dengan ffmpeg untuk meminimalkan kemungkinan re-encoding saat upload.</div>
         </div>
     </div>
 
@@ -472,21 +293,23 @@
         });
 
         // Download remux helper script
+        // Two remux buttons (left panel and right panel)
         const downloadRemuxBtn = document.getElementById('downloadRemuxBtn');
-        if (downloadRemuxBtn) {
-            downloadRemuxBtn.addEventListener('click', () => {
-                const content = `Param(\n    [Parameter(Mandatory=$true)][string]$input\n)\n\n$ffmpeg = \"ffmpeg\"\n\n# Check if ffmpeg is available\ntry {\n    & $ffmpeg -version > $null 2>&1\n} catch {\n    Write-Error \"ffmpeg tidak ditemukan. Install ffmpeg dan pastikan ada di PATH.\"\n    exit 1\n}\n\nif (-not (Test-Path $input)) {\n    Write-Error \"File input tidak ditemukan: $input\"\n    exit 1\n}\n\n$dir = Split-Path -Parent $input\n$base = [System.IO.Path]::GetFileNameWithoutExtension($input)\n$ext = [System.IO.Path]::GetExtension($input)\n$output = Join-Path $dir (\"${base}_faststart${ext}\")\n\nWrite-Output \"Menjalankan: ffmpeg -i \\\"$input\\\" -c copy -movflags +faststart \\\"$output\\\"\"\n& $ffmpeg -y -i $input -c copy -movflags +faststart $output\n\nif ($LASTEXITCODE -eq 0) {\n    Write-Output \"Selesai. Output: $output\"\n} else {\n    Write-Error \"ffmpeg gagal (exit code $LASTEXITCODE)\"\n}\n`;
-                const blob = new Blob([content], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'remux-faststart.ps1';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            });
+        const downloadRemuxBtn2 = document.getElementById('downloadRemuxBtn2');
+        function offerRemuxDownload() {
+            const content = `Param(\n    [Parameter(Mandatory=$true)][string]$input\n)\n\n$ffmpeg = \"ffmpeg\"\n\n# Check if ffmpeg is available\ntry {\n    & $ffmpeg -version > $null 2>&1\n} catch {\n    Write-Error \"ffmpeg tidak ditemukan. Install ffmpeg dan pastikan ada di PATH.\"\n    exit 1\n}\n\nif (-not (Test-Path $input)) {\n    Write-Error \"File input tidak ditemukan: $input\"\n    exit 1\n}\n\n$dir = Split-Path -Parent $input\n$base = [System.IO.Path]::GetFileNameWithoutExtension($input)\n$ext = [System.IO.Path]::GetExtension($input)\n$output = Join-Path $dir (\"${base}_faststart${ext}\")\n\nWrite-Output \"Menjalankan: ffmpeg -i \\\"$input\\\" -c copy -movflags +faststart \\\"$output\\\"\"\n& $ffmpeg -y -i $input -c copy -movflags +faststart $output\n\nif ($LASTEXITCODE -eq 0) {\n    Write-Output \"Selesai. Output: $output\"\n} else {\n    Write-Error \"ffmpeg gagal (exit code $LASTEXITCODE)\"\n}\n`;
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'remux-faststart.ps1';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
+        if (downloadRemuxBtn) downloadRemuxBtn.addEventListener('click', offerRemuxDownload);
+        if (downloadRemuxBtn2) downloadRemuxBtn2.addEventListener('click', offerRemuxDownload);
     </script>
 </body>
 </html>
